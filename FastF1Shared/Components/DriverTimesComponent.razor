@@ -1,0 +1,87 @@
+﻿@using FastF1Shared.Model;
+@inject FastF1Shared.Service.DriverTimeService dtService
+@inject IJSRuntime JsRuntime
+
+@using Microsoft.JSInterop;
+@using Plotly.Blazor.LayoutLib
+
+
+@if (times == null) {
+	<p><em>Loading data...</em></p>
+}else if (!loaded) {
+	<p><em>Failed to load data :(</em></p>
+} else {
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Time</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var data in times) {
+				<tr>
+					<td>@data.name</td>
+					<td>@data.time</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+	<br />
+	@if (windowDimension != null && windowDimension.width < 600) {
+		<PlotlyChart Id="TestId" Config="config" Layout="layout" Data="data" @ref="chart" />
+	} else {
+		<div class="row">
+			<div class="col-2"></div>
+			<div class="col-8">
+				<PlotlyChart Id="TestId" Config="config" Layout="layout" Data="data" @ref="chart" />
+			</div>
+			<div class="col-2"></div>
+		</div>
+	}
+}
+
+@code {
+	List<DriverTime>? times = new List<DriverTime>();
+	bool loaded = false;
+	PlotlyChart? chart;
+	Config? config;
+	Layout? layout;
+	List<ITrace>? data;
+	WindowDimension? windowDimension;
+
+	protected override async Task OnInitializedAsync() {
+		(loaded, times) = await Service.DriverTimeService.GetDriverTimeAsync();
+
+		windowDimension = await JsRuntime.InvokeAsync<WindowDimension>("getWindowDimensions");
+
+		if (times?.Count > 0) {
+			config = new Config {
+					Responsive = true,
+					DisplayModeBar = Plotly.Blazor.ConfigLib.DisplayModeBarEnum.False,
+					AutoSizable = true
+				};
+
+			layout = new Layout {
+					Title = new Title {
+						Text = "Qualy time"
+					},
+					AutoSize = true,
+					BarGap = (decimal)0.2,
+					Height = (windowDimension.width > 600) ? 350 : 250
+				
+				};
+
+			data = new List<ITrace>{
+				new Bar
+				{
+					X = times.Select(t => (object)t.name).ToList(),
+					Y = times.Select(t => (object)t.time).ToList(),
+					Name = "Vreme"
+				},
+			};
+		}
+
+	}
+
+}
