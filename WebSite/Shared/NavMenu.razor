@@ -1,39 +1,26 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">FastF1Hub</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
+﻿
+<div class="container">
+	<nav class="navbar navbar-expand-lg card shadow-sm">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="/">Quick F1 Hub</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLinks" aria-controls="navbarLinks" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarLinks">
+				<div class="navbar-nav me-auto">
+					<a class="nav-link nav-item" href="raceoverview"><span data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show">Race overview</span></a>
+				</div>
+			</div>
+		</div>
+	</nav> 
 </div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="drivertimes">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Driver Times
-            </NavLink>
-        </div>
-    </nav>
-</div>
+<br />
 
-@code {
-    private bool collapseNavMenu = true;
+<style>
+	body {
+		background-image: linear-gradient(to right, #2c3e50, #4ca1af);
+	}
 
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
+	
+</style>

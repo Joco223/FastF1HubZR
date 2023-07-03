@@ -1,0 +1,225 @@
+﻿@using FastF1Shared.Model;
+@inject FastF1Shared.Service.DriversResultService dtService
+@inject IJSRuntime JsRuntime
+
+@using Microsoft.JSInterop;
+@using Plotly.Blazor.LayoutLib
+
+@if (!loaded) {
+	<div class="d-flex justify-content-center" style="width: 100%; height: 100%">
+		<div class="spinner-border m-5  card-img-top" style="width: 3rem; height: 3rem;" role="status"></div>
+	</div>
+}else if (((sessionType == "Race" || sessionType == "Sprint") && results == null) || (sessionType == "Qualification" && qualiResults == null)) {
+	<p><em>Failed to load data :(</em></p>
+} else {
+	<div class="table-responsive">
+		<table class="table table-striped table-sm mb-2 align-middle">
+			<thead class="table-light">
+				<tr>
+					@if (sessionType == "Race" || sessionType == "Sprint") {
+						<th>Pos.</th>
+						<th>Name</th>
+						<th>Abrv.</th>
+						<th>Number</th>
+						<th>Team</th>
+						<th>Points</th>
+						<th>Status</th>
+					} else {
+						<th>Pos.</th>
+						<th>Name</th>
+						<th>Team</th>
+						<th>Q1</th>
+						<th>Q2</th>
+						<th>Q3</th>
+					}
+				</tr>
+			</thead>
+			<tbody class="table-group-divider">
+				@for (int i = tableStart; i < tableEnd; i++) {
+					<tr>
+						@if (results != null && (sessionType == "Race" || sessionType == "Sprint")) {
+							<td>@results[i].position</td>
+							<td>@results[i].driverName</td>
+							<td>@results[i].driverAbrv</td>
+							<td>@results[i].driverNumber</td>
+							<td>@results[i].constructors</td>
+							<td>@results[i].points</td>
+							<td>@results[i].status</td>
+						} else {
+							if (qualiResults != null) {
+								<td>@qualiResults[i].position</td>
+								<td>@qualiResults[i].name</td>
+								<td>@qualiResults[i].constructorsName</td>
+								<td>@qualiResults[i].q1</td>
+								<td>@qualiResults[i].q2</td>
+								<td>@qualiResults[i].q3</td>
+							}
+						}
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+	
+	@*@if (windowDimension != null && windowDimension.width < 600) {
+		<PlotlyChart Id="TestId" Config="config" Layout="layout" Data="data" @ref="chart" />
+	} else {
+		<div class="row">
+			<div class="col-2"></div>
+			<div class="col-8">
+				<PlotlyChart Id="TestId" Config="config" Layout="layout" Data="data" @ref="chart" />
+			</div>
+			<div class="col-2"></div>
+		</div>
+	}*@
+	<div class="text-center">
+		<div class="btn-group">
+			@if (firstPart) {
+				<button type="button" class="btn btn-primary" disabled>Previous</button>
+			} else {
+				<button type="button" class="btn btn-primary" @onclick="decrementTable">Previous</button>
+			}
+			<button type="button" class="btn btn-outline-primary" disabled>@tableStartShow - @tableEndShow</button>
+			@if (firstPart) {
+				<button type="button" class="btn btn-primary" @onclick="incrementTable">Next</button>
+			} else {
+				<button type="button" class="btn btn-primary" disabled>Next</button>
+			}
+		</div>
+	</div>
+	@*<div class="row">
+		<div class="col-2"></div>
+		<div class="col-2">
+			@if (firstPart) {
+				<button type="button" class="btn btn-outline-primary" disabled>Previous</button>
+			} else {
+				<button type="button" class="btn btn-outline-primary" @onclick="decrementTable">Previous</button>
+			}
+		</div>
+		<div class="col-1"></div>
+		<div class="col-2">
+				@tableStartShow - @tableEndShow
+		</div>
+		<div class="col-1"></div>
+		<div class="col-2">
+			@if (firstPart) {
+				<button type="button" class="btn btn-outline-primary" @onclick="incrementTable">Next</button>
+			} else {
+				<button type="button" class="btn btn-outline-primary" disabled>Next</button>
+			}
+		</div>
+		<div class="col-2"></div>
+	</div>*@
+}
+
+@code {
+	private string sessionType = "";
+
+	private int tableStart = 0;
+	private int tableEnd = 0;
+
+	private int tableStartShow => tableStart + 1;
+	private int tableEndShow => tableEnd;
+
+	private bool firstPart = true;
+
+	public List<driverRaceResult>? results = null;
+	public List<driverQualyResult>? qualiResults = null;
+	bool loaded = false;
+
+	private void decrementTable() {
+		tableStart = 0;
+		if (sessionType == "Race" || sessionType == "Sprint") {
+			if (results != null) {
+				tableEnd = results.Count / 2;
+			} else {
+				tableEnd = 0;
+			}
+		} else {
+			if (qualiResults != null) {
+				tableEnd = qualiResults.Count / 2;
+			} else {
+				tableEnd = 0;
+			}
+		}
+		firstPart = true;
+	}
+
+	private void incrementTable() {
+		if (sessionType == "Race" || sessionType == "Sprint") {
+			if (results != null)
+			{
+				tableStart = results.Count / 2;
+				tableEnd = results.Count;
+			} else {
+				tableStart = 0;
+				tableEnd = 0;
+			}
+		} else {
+			if (qualiResults != null) {
+				tableStart = qualiResults.Count / 2;
+				tableEnd = qualiResults.Count;
+			} else {
+				tableStart = 0;
+				tableEnd = 0;
+			}
+		}
+		firstPart = false;
+	}
+
+	public async Task<bool?> loadTable(int year, int round, string type) {
+		loaded = false;
+		results = null;
+		sessionType = type;
+		this.StateHasChanged();
+		if (type == "Race" || type == "Sprint") {
+			(loaded, results) = await Service.DriversResultService.getRaceResults(year, round.ToString());
+		} else {
+			(loaded, qualiResults) = await Service.DriversResultService.getQualyResults(year, round.ToString());
+		}
+		decrementTable();
+		this.StateHasChanged();
+		return loaded;
+	}
+
+	//PlotlyChart? chart;
+	//Config? config;
+	//Layout? layout;
+	//List<ITrace>? data;
+	//WindowDimension? windowDimension;
+
+	//protected override async Task OnInitializedAsync() {
+	//	(loaded, times) = await Service.DriversResultService.GetDriverTimeAsync();
+
+	//	windowDimension = await JsRuntime.InvokeAsync<WindowDimension>("getWindowDimensions");
+
+	//	if (times?.Count > 0) {
+	//		config = new Config {
+	//				Responsive = true,
+	//				DisplayModeBar = Plotly.Blazor.ConfigLib.DisplayModeBarEnum.False,
+	//				AutoSizable = true
+	//			};
+
+	//		layout = new Layout {
+	//				Title = new Title {
+	//					Text = "Qualy time"
+	//				},
+	//				AutoSize = true,
+	//				BarGap = (decimal)0.2,
+	//				Height = (windowDimension.width > 600) ? 350 : 250
+
+	//			};
+
+	//		data = new List<ITrace>{
+	//			new Bar
+	//			{
+	//				X = times.Select(t => (object)t.name).ToList(),
+	//				Y = times.Select(t => (object)t.time).ToList(),
+	//				Name = "Vreme"
+	//			},
+	//		};
+	//	}
+
+	//}
+
+}

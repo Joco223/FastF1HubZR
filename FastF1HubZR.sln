@@ -6,7 +6,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastF1HubZR", "FastF1HubZR\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastF1Shared", "FastF1Shared\FastF1Shared.csproj", "{2DDEAFF6-4557-4DF0-92EF-D95C1D3C136E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSite", "WebSite\WebSite.csproj", "{EC3CC0C1-379C-48A5-905D-43EC53F4A1D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSite", "WebSite\WebSite.csproj", "{EC3CC0C1-379C-48A5-905D-43EC53F4A1D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

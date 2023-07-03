@@ -18,7 +18,7 @@ public static class MauiProgram {
 		builder.Logging.AddDebug();
 #endif
 
-		builder.Services.AddSingleton<FastF1Shared.Service.DriverTimeService>();
+		builder.Services.AddSingleton<FastF1Shared.Service.DriversResultService>();
 
 		return builder.Build();
 	}

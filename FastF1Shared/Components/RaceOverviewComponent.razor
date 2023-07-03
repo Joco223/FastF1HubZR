@@ -1,0 +1,364 @@
+﻿@using FastF1Shared.Model;
+@inject FastF1Shared.Service.raceOverviewService roService
+@inject IJSRuntime JsRuntime
+
+@using FastF1Shared.Service;
+@using Microsoft.JSInterop;
+@using Plotly.Blazor.LayoutLib
+
+<div class="container">
+	<div class="card shadow-sm mb-3 d-flex p-2" style="width: 15rem">
+		<h2 class="card-title mt-2">Race Overview</h2>
+	</div>
+
+	<div class="card shadow-sm p-2 mb-4">
+		<div class="row mb-3 gy-2">
+			<div class="col-sm-2">
+				<label class="form-label" for="dateInput">Godina: </label>
+				<select class="form-select" name="dateInput" id="dateInput" value="@yearInput" @onchange="@loadEventList">
+					@if (!getSeasonsSatus) {
+						<option value="0" selected>Loading data...</option>
+					}else if (seasons == null) {
+						<option value="0" selected>Failed to load data :(</option>
+					} else {
+						@foreach (Season s in seasons) {
+							@if (s.year == DateTime.Now.Year) {
+								<option value="@s.year" selected>@s.year</option>
+							} else {
+								<option value="@s.year">@s.year</option>	
+							}
+						}
+					}
+				</select>
+			</div>
+			<div class="col-sm-7">
+				<label class="form-label" for="eventInput">Trka: </label>
+				<InputSelect class="form-select" name="eventInput" id="raceinput" @bind-Value="eventInput">
+					@if (!getRacesHttpStatus) {
+						<option selected value="0">Loading data...</option>
+					}else if (races == null) {
+						<option selected value="0">Failed to load data :(</option>
+					} else {
+						@for (int i = 0; i < races.Count; i++) {
+							@if (i == 0) {
+								<option value="@i" selected>@races[i].raceName</option>
+							} else {
+								<option value="@i">@races[i].raceName</option>
+							}
+						}
+					}
+				</InputSelect>
+			</div>
+			<div class="col-sm-3">
+				<label class="form-label" for="sessionInput">Sesija: </label>
+				<InputSelect class="form-select" name="sessionInput" id="sessionInput" @bind-Value="sessionInput">
+					@if (!getRacesHttpStatus) {
+						<option selected value="0">Loading data...</option>
+					} else if (races == null) {
+						<option selected value="0">Failed to load data :(</option>
+					} else if (eventInput == -1) {
+						<option selected value="0">Izaberite trku</option>	
+					} else {
+						<option selected value="Qualifying">Qualifying</option>
+						@if (races[eventInput].type == "Sprint") {
+							<option value="Sprint">Sprint</option>
+						}
+						<option value="Race">Race</option>
+					}
+				</InputSelect>
+			</div>
+		</div>
+	</div>
+	<div class="row mb-4 gy-2">
+		<div class="col-sm-4" >
+			<div class="card shadow-sm" style="height: 100%">
+				<div class="card-body">
+					<h4 class="card-title border-bottom">Detalji trke</h4>
+					@if (!getRacesHttpStatus || eventInput == -1) {
+						@if (eventInput == -1) {
+							<h6>Izaberite trku da bi videli detalje</h6>
+						}
+
+						<h6><b>Redni broj trke - </b> <span class="placeholder placeholder-wave col-1"></span></h6>
+						<h6><b>Naziv - </b> <span class="placeholder placeholder-wave col-2"></span></h6>
+						<h6><b>Zemlja - </b> <span class="placeholder placeholder-wave col-2"></span></h6>
+						<h6><b>Grad - </b> <span class="placeholder placeholder-wave col-2"></span></h6>
+						<h6><b>Tip - </b> <span class="placeholder placeholder-wave col-1"></span></h6>
+						<h6><b>Sesije - </b> <span class="placeholder placeholder-wave col-3"></span></h6>
+					} else if (races == null) {
+						<h6>Failed to load data :(</h6>
+					} else {
+						<h6><b>Redni broj trke - </b> @races[eventInput].round</h6>
+						<h6><b>Naziv - </b> @races[eventInput].raceName</h6>
+						<h6><b>Zemlja - </b> @races[eventInput].circuitCountry</h6>
+						<h6><b>Grad - </b> @races[eventInput].circuitLocation</h6>
+						<h6><b>Tip - </b> @races[eventInput].type</h6>
+						<h6><b>Sesije - </b> @raceSessions </h6>
+					}
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="card shadow-sm" style="height: 100%">
+				<div class="card-body">
+					<h4 class="card-title border-bottom">Detalji staze</h4>
+					@if (!getRacesHttpStatus || eventInput == -1) {
+						@if (eventInput == -1) {
+							<h6>Izaberite trku da bi videli detalje</h6>
+						}
+
+						<h6><b>Naziv - </b> <span class="placeholder placeholder-wave col-2"></span></h6>
+						<h6><b>Lokacija - </b> <span class="placeholder placeholder-wave col-2"></span></h6>
+						<h6><b>Zemlja - </b> <span class="placeholder placeholder-wave col-2"></span></h6>
+						<h6><b>Latitude - </b> <span class="placeholder placeholder-wave col-1"></span></h6>
+						<h6><b>Longtitude - </b> <span class="placeholder placeholder-wave col-1"></span></h6>
+						<h6><b>Nadmorska visina - </b> <span class="placeholder placeholder-wave col-1"></span></h6>
+					} else if (races == null) {
+						<h6>Failed to load data :(</h6>
+					} else {
+						<h6><b>Naziv - </b> @races[eventInput].circuitName</h6>
+						<h6><b>Lokacija - </b> @races[eventInput].circuitLocation</h6>
+						<h6><b>Zemlja - </b> @races[eventInput].circuitCountry</h6>
+						<h6><b>Latitude - </b> @races[eventInput].circuitLatitude</h6>
+						<h6><b>Longtitude - </b> @races[eventInput].circuitLongtitude</h6>
+						<h6><b>Nadmorska visina - </b> @races[eventInput].circuitAltitude m</h6>
+					}
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="card shadow-sm" style="height: 100%">
+				<div class="card-body">
+					<h4 class="card-title border-bottom">Detalji sesije</h4>
+					@if (!getRacesHttpStatus) {
+						<h6><b>FP1 pocetak - </b> <span class="placeholder placeholder-wave col-2"></span></h6>
+						<h6><b>FP2 pocetak - </b> <span class="placeholder placeholder-wave col-2"></span></h6>
+						@if (races != null && races[eventInput].type == "Sprint") {
+							<h6><b>Qualification pocetak - </b> <span class="placeholder placeholder-wave col-2"></span></h6>
+							<h6><b>Sprint pocetak - </b> <span class="placeholder placeholder-wave col-2"></span></h6>
+						} else {
+							<h6><b>FP3 pocetak - </b> <span class="placeholder placeholder-wave col-2"></span></h6>
+							<h6><b>Qualification pocetak - </b> <span class="placeholder placeholder-wave col-2"></span></h6>
+						}
+						<h6><b>Race pocetak - </b> <span class="placeholder placeholder-wave col-2"></span></h6>
+					} else if (races == null) {
+						<h6>Failed to load data :(</h6>
+					} else {
+						<h6><b>FP1 pocetak - </b> @races[eventInput].fp1DT </h6>
+						<h6><b>FP2 pocetak - </b> @races[eventInput].fp2DT </h6>
+						@if (races != null && races[eventInput].type == "Sprint") {
+							<h6><b>Qualification pocetak - </b> @races[eventInput].qualiDT </h6>
+							<h6><b>Sprint pocetak - </b> @races[eventInput].sprintDT </h6>
+						} else {
+							<h6><b>FP3 pocetak - </b> @races[eventInput].fp3DT </h6>
+							<h6><b>Qualification pocetak - </b> @races[eventInput].qualiDT </h6>
+						}
+						<h6><b>Race pocetak - </b> @races[eventInput].raceDT </h6>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row mb-4 gy-2">
+		<div class="col-sm-4">
+			@if (!driverImgResult) {
+				<div class="d-flex justify-content-center">
+					<div class="spinner-border m-5  card-img-top" style="width: 3rem; height: 3rem;" role="status"></div>
+				</div>
+			}else if (driverImgUrl == null) {
+				<h6>Failed to load driver image :(</h6>
+			} else {
+				<div style="min-height: 12rem">
+					<img class="mx-auto d-block rounded" src="@driverImgUrl" style="object-fit: scale-down; height: 18rem" />
+				</div>
+			}
+			<br />
+			<div class="card shadow-sm" style="min-height: 4rem">
+				@if (!getDriverDetailStatus) {
+					<div class="d-flex justify-content-center">
+						<div class="spinner-border m-5  card-img-top" style="width: 3rem; height: 3rem;" role="status"></div>
+					</div>
+				}else if (driverData == null) {
+					<h6>Failed to load driver details :(</h6>
+				} else {
+					@*<div style="overflow: hidden; -webkit-transform: translate3d(0, 0, 0);">
+						<img class="card-img-top mx-auto d-block" src="@driverImgUrl" style="object-fit: cover; min-height:200px; max-height:250px; -webkit-filter: blur(16px); overflow: hidden;" />
+					</div>*@
+					<div class="boder-bottom"></div>
+					<div class="card-body">
+						<h4 class="card-title border-bottom">Detalji prvog vozaca</h4>
+						<div class="row">
+							<div class="col">
+								<h6><b>Forename - </b> @driverData.forename</h6>
+								<h6><b>Code - </b> @driverData.code</h6>
+								<h6><b>DoB - </b> @driverData.dob</h6>
+								<h6><b>Wiki - </b> <a href="@driverData.url">Link</a></h6>
+							</div>
+							<div class="col">
+								<h6><b>Surname - </b> @driverData.surname</h6>
+								<h6><b>Number - </b> @driverData.number</h6>
+								<h6><b>Nationality - </b> @driverData.nationality</h6>
+							</div>
+						</div>
+					</div>
+
+				}
+			</div>
+		</div>
+		<div class="col-sm-8">
+			<div class="card shadow-sm" style="height: 100%; min-height: 16rem">
+				<div class="card-body">
+					<h4 class="card-title border-bottom">Raspored vozaca</h4>
+					<DriversResultComponent @ref="resultTable" />
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+@code {
+
+	string raceSessions = "";
+
+	private DriversResultComponent? resultTable;
+
+	bool driverImgResult = false;
+	string? driverImgUrl = null;
+
+	int yearInput = DateTime.Now.Year;
+	int _eventInput;
+	int eventInput {
+		get => _eventInput;
+		set {
+			_eventInput = value;
+
+			loadRaceData();
+		}
+	}
+
+	string _sessionInput = "";
+	string sessionInput {
+		get => _sessionInput;
+		set {
+			_sessionInput = value;
+
+			resetDriverData();
+			loadSessionData();
+		}
+	}
+
+	bool getSeasonsSatus = false;
+	List<Season>? seasons = null;
+
+	bool getRacesHttpStatus = false;
+	List<Race>? races = null;
+
+	bool getDriverDetailStatus = false;
+	detailDriverData? driverData = null;
+
+	private async Task<bool> loadDriverDetail() {
+		int driverID = -1;
+		if (sessionInput == "Race" || sessionInput == "Sprint") {
+			if (resultTable != null && resultTable.results != null && resultTable.results.Count > 0) {
+				driverID = resultTable.results[0].driverID;
+			}
+		} else {
+			if (resultTable != null && resultTable.qualiResults != null && resultTable.qualiResults.Count > 0) {
+				driverID = resultTable.qualiResults[0].driverID;
+			}
+		}
+
+		if (driverID != -1) {
+			(getDriverDetailStatus, driverData) = await driverDetailService.getDriver(driverID);
+
+			loadDriverImage();
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private async void loadSessionData() {
+		if (races != null && resultTable != null) {
+			driverImgResult = false;
+			driverImgUrl = null;
+			_ = await resultTable.loadTable(yearInput, races[eventInput].round, sessionInput);
+			_ = await loadDriverDetail();
+		}
+	}
+
+	private async void loadDriverImage() {
+		if (sessionInput == "Race" || sessionInput == "Sprint") {
+			if (resultTable != null && resultTable.results != null && resultTable.results.Count > 0) {
+				driverRaceResult res = resultTable.results[0];
+
+				int slashIndex = res.url.LastIndexOf('/');
+				string searchTerm = res.url[(slashIndex + 1)..];
+
+				(driverImgResult, driverImgUrl) = await wikipediaAPIService.getPageImg(searchTerm);
+			}
+		} else {
+			if (resultTable != null && resultTable.qualiResults != null && resultTable.qualiResults.Count > 0) {
+				driverQualyResult res = resultTable.qualiResults[0];
+
+				int slashIndex = res.url.LastIndexOf('/');
+				string searchTerm = res.url[(slashIndex + 1)..];
+
+				(driverImgResult, driverImgUrl) = await wikipediaAPIService.getPageImg(searchTerm);
+			}
+		}
+		this.StateHasChanged();
+	}
+
+	private async void loadRaceData() {
+		if (races != null) {
+			resetRaceData();
+
+			for (int i = 0; i < races[eventInput].sessions.Count; i++) {
+				raceSessions += races[eventInput].sessions[i];
+				if (i != races[eventInput].sessions.Count - 1) {
+					raceSessions += ", ";
+				}
+			}
+
+			loadSessionData();
+			_ = await loadDriverDetail();
+		}
+	}
+
+	private void resetDriverData() {
+		getDriverDetailStatus = false;
+		driverImgResult = false;
+		driverData = null;
+		driverImgUrl = null;
+	}
+
+	private void resetRaceData() {
+		raceSessions = "";
+		sessionInput = "Qualifying";
+		resetDriverData();
+	}
+
+	private void resetPageInput() {
+		getRacesHttpStatus = false;
+		races = null;
+		eventInput = 0;
+		resetRaceData();
+	}
+
+	private async Task loadEventList(ChangeEventArgs? e) {
+		if (e != null && e.Value != null) {
+			yearInput = Convert.ToInt32(e.Value.ToString());	
+		}
+
+		resetPageInput();
+		(getSeasonsSatus, seasons) = await raceOverviewService.getSeasons();
+		(getRacesHttpStatus, races) = await raceOverviewService.getRaces(yearInput);
+		loadRaceData();
+	}
+
+	protected override async Task OnInitializedAsync() {
+		await loadEventList(null);
+	}
+}
