@@ -1,0 +1,510 @@
+﻿@using FastF1Shared.Model;
+@using FastF1Shared.Service;
+
+<div class="container">
+	<div class="card shadow-sm mb-3 d-flex p-2" style="width: 16rem">
+		<h2 class="card-title mt-2">Driver vs. Driver</h2>
+	</div>
+	@*Driver selectors*@
+	<div class="row mb-2 gy-2">
+		<div class="col-sm-4">
+			<div class="card shadow-sm p-2">
+				<h4 class="card-title mt-2 mb-2">Prvi vozac</h4>
+				<InputSelect class="form-select mb-2" name="driverOneInput" id="driverOneInput" @bind-Value="driverOne">
+					@if (!getDriversStatus) {
+						<option value="-1" selected>Loading data...</option>
+					}else if (drivers == null) {
+						<option value="-1" selected>Failed to load data :(</option>
+					} else {
+						@for (int i = 0; i < drivers.Count; i++) {
+							if (i == 0) {
+								<option value="@drivers[i].driverId" selected>@drivers[i].name</option>
+							} else {
+								<option value="@drivers[i].driverId">@drivers[i].name</option>
+							}
+						}
+					}
+				</InputSelect>
+			</div>
+		</div>
+		<div class="col-sm-4"></div>
+		<div class="col-sm-4">
+			<div class="card shadow-sm p-2">
+				<h4 class="card-title mt-2 mb-2">Drugi vozac</h4>
+				<InputSelect class="form-select mb-2" name="driverTwoInput" id="driverTwoInput" @bind-Value="driverTwo">
+					@if (!getDriversStatus) {
+						<option value="-1" selected>Loading data...</option>
+					} else if (drivers == null) {
+						<option value="-1" selected>Failed to load data :(</option>
+					} else {
+						@for (int i = 0; i < drivers.Count; i++) {
+							if (i == 0) {
+								<option value="@drivers[i].driverId" selected>@drivers[i].name</option>
+							} else {
+								<option value="@drivers[i].driverId">@drivers[i].name</option>
+							}
+						}
+					}
+				</InputSelect>
+			</div>
+		</div>
+	</div>
+
+	@*Driver data*@
+	<div class="row mb-2 gy-2">
+		<div class="col-sm-4">
+			@if (!getDriverOneImage) {
+				<div class="d-flex justify-content-center mb-2">
+					<div class="spinner-border m-5  card-img-top" style="width: 3rem; height: 3rem;" role="status"></div>
+				</div>
+			} else if (driverOneImg == null) {
+				<h6 class="display-6">Failed to load driver image :(</h6>
+			} else {
+				<div style="min-height: 12rem">
+					<img class="mx-auto d-block rounded" src="@driverOneImg" style="object-fit: scale-down; height: 18rem; max-width: 24rem" />
+				</div>
+			}
+			<div class="card shadow-sm p-2 mt-2">
+				@if (!getDriverOneStatus) {
+					<div class="d-flex justify-content-center">
+						<div class="spinner-border m-5  card-img-top" style="width: 3rem; height: 3rem;" role="status"></div>
+					</div>
+				} else if (driverOneData == null) {
+					<h3>Failed to load data :(</h3>
+				} else {
+					<h4 class="display-6 border-bottom">@driverOneData.forename @driverOneData.surname</h4>
+					<div class="row">
+						<div class="col">
+							<h6><b>Code - </b> @driverOneData.code</h6>
+							<h6><b>Number - </b> @driverOneData.number</h6>
+							<h6><b>DoB - </b> @driverOneData.dob</h6>
+						</div>
+						<div class="col">
+							<h6><b>Nationality - </b> @driverOneData.nationality</h6>
+							<h6><b>Wiki - </b> <a href="@driverOneData.url">Link</a></h6>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+		<div class="col-sm-4">
+			<div class="card shadow-sm p-2 text-center">
+				<h3>Poredenje</h3>
+				@if (!getDriverOneStatus || !getDriverTwoStatus) {
+					<div class="d-flex justify-content-center" style="width: 100%">
+						<div class="spinner-border m-5  card-img-top" style="width: 3rem; height: 3rem;" role="status"></div>
+					</div>
+				} else if (driverOneData == null || driverTwoData == null) {
+					<h6>Failed to load data :(</h6>
+				} else {
+					@*Sampionati*@
+					<div class="container p-2 border-top">
+						<div class="row" >
+							<div class="col">
+								<h5>@driverOneData?.championships</h5>
+							</div>
+							<div class="col-6">
+								<h5>Sampionati</h5>
+							</div>
+							<div class="col">
+								<h5>@driverTwoData?.championships</h5>
+							</div>
+						</div>
+						<div style="width: 100%; display: flex; height: 30px;">
+							@if (driverOneData?.championships != 0) {
+								if (driverTwoData?.championships == 0) {
+									<div class="text-center p-1" style="width: @championshipOneWidth%; color: white; background: rgb(246, 62, 48); border-radius: 10px 10px 10px 10px"><b>@championshipOneWidth %</b></div>
+								} else {
+									<div class="text-center p-1" style="width: @championshipOneWidth%; color: white; background: rgb(246, 62, 48); border-radius: 10px 0px 0px 10px"><b>@championshipOneWidth %</b></div>
+								}
+							}
+
+							@if (driverTwoData?.championships != 0) {
+								if (driverOneData?.championships == 0) {
+									<div class="text-center p-1" style="width: @championshipTwoWidth%; color: white; background: rgb(50, 130, 246); border-radius: 10px 10px 10px 10px"><b>@championshipTwoWidth %</b></div>
+								} else {
+									<div class="text-center p-1" style="width: @championshipTwoWidth%; color: white; background: rgb(50, 130, 246); border-radius: 0px 10px 10px 0px"><b>@championshipTwoWidth %</b></div>
+								}
+							}	
+						</div>
+					</div>
+
+					@*Pobede*@
+					<div class="container p-2 border-top">
+						<div class="row">
+							<div class="col">
+								<h5>@driverOneData?.wins</h5>
+							</div>
+							<div class="col-6">
+								<h5>Pobede</h5>
+							</div>
+							<div class="col">
+								<h5>@driverTwoData?.wins</h5>
+							</div>
+						</div>
+						<div style="width: 100%; display: flex; height: 30px;">
+							@if (driverOneData?.wins != 0) {
+								if (driverTwoData?.wins == 0) {
+									<div class="text-center p-1" style="width: @winsOneWidth%; color: white; background: rgb(246, 62, 48); border-radius: 10px 10px 10px 10px"><b>@winsOneWidth %</b></div>
+								} else {
+									<div class="text-center p-1" style="width: @winsOneWidth%; color: white; background: rgb(246, 62, 48); border-radius: 10px 0px 0px 10px"><b>@winsOneWidth %</b></div>
+								}
+							}
+
+							@if (driverTwoData?.wins != 0) {
+								if (driverOneData?.wins == 0) {
+									<div class="text-center p-1" style="width: @winsTwoWidth%; color: white; background: rgb(50, 130, 246); border-radius: 10px 10px 10px 10px"><b>@winsTwoWidth %</b></div>
+								} else {
+									<div class="text-center p-1" style="width: @winsTwoWidth%; color: white; background: rgb(50, 130, 246); border-radius: 0px 10px 10px 0px"><b>@winsTwoWidth %</b></div>
+								}
+							}
+						</div>
+					</div>
+
+					@*Sprint pobede*@
+					<div class="container p-2 border-top">
+						<div class="row">
+							<div class="col">
+								<h5>@driverOneData?.sprintWins</h5>
+							</div>
+							<div class="col-6">
+								<h5>Sprint pobede</h5>
+							</div>
+							<div class="col">
+								<h5>@driverTwoData?.sprintWins</h5>
+							</div>
+						</div>
+						<div style="width: 100%; display: flex; height: 30px;">
+							@if (driverOneData?.sprintWins != 0) {
+								if (driverTwoData?.sprintWins == 0) {
+									<div class="text-center p-1" style="width: @sprintWinsOneWidth%; color: white; background: rgb(246, 62, 48); border-radius: 10px 10px 10px 10px"><b>@sprintWinsOneWidth %</b></div>
+								} else {
+									<div class="text-center p-1" style="width: @sprintWinsOneWidth%; color: white; background: rgb(246, 62, 48); border-radius: 10px 0px 0px 10px"><b>@sprintWinsOneWidth %</b></div>
+								}
+							}
+
+							@if (driverTwoData?.sprintWins != 0) {
+								if (driverOneData?.sprintWins == 0) {
+									<div class="text-center p-1" style="width: @sprintWinsTwoWidth%; color: white; background: rgb(50, 130, 246); border-radius: 10px 10px 10px 10px"><b>@sprintWinsTwoWidth %</b></div>
+								} else {
+									<div class="text-center p-1" style="width: @sprintWinsTwoWidth%; color: white; background: rgb(50, 130, 246); border-radius: 0px 10px 10px 0px"><b>@sprintWinsTwoWidth %</b></div>
+								}
+							}
+						</div>
+					</div>
+
+					@*Pole pozicije*@
+					<div class="container p-2 border-top">
+						<div class="row">
+							<div class="col">
+								<h5>@driverOneData?.poles</h5>
+							</div>
+							<div class="col-6">
+								<h5>Pole pozicije</h5>
+							</div>
+							<div class="col">
+								<h5>@driverTwoData?.poles</h5>
+							</div>
+						</div>
+						<div style="width: 100%; display: flex; height: 30px;">
+							@if (driverOneData?.poles != 0) {
+								if (driverTwoData?.poles == 0) {
+									<div class="text-center p-1" style="width: @polesOneWidth%; color: white; background: rgb(246, 62, 48); border-radius: 10px 10px 10px 10px"><b>@polesOneWidth %</b></div>
+								} else {
+									<div class="text-center p-1" style="width: @polesOneWidth%; color: white; background: rgb(246, 62, 48); border-radius: 10px 0px 0px 10px"><b>@polesOneWidth %</b></div>
+								}
+							}
+
+							@if (driverTwoData?.poles != 0) {
+								if (driverOneData?.poles == 0) {
+									<div class="text-center p-1" style="width: @polesTwoWidth%; color: white; background: rgb(50, 130, 246); border-radius: 10px 10px 10px 10px"><b>@polesTwoWidth %</b></div>
+								} else {
+									<div class="text-center p-1" style="width: @polesTwoWidth%; color: white; background: rgb(50, 130, 246); border-radius: 0px 10px 10px 0px"><b>@polesTwoWidth %</b></div>
+								}
+							}
+						</div>
+					</div>
+
+					@*Podijumi*@
+					<div class="container p-2 border-top">
+						<div class="row">
+							<div class="col">
+								<h5>@driverOneData?.totalPodiums</h5>
+							</div>
+							<div class="col-6">
+								<h5>Podijumi</h5>
+							</div>
+							<div class="col">
+								<h5>@driverTwoData?.totalPodiums</h5>
+							</div>
+						</div>
+						<div style="width: 100%; display: flex; height: 30px;">
+							@if (driverOneData?.totalPodiums != 0) {
+								if (driverTwoData?.totalPodiums == 0) {
+									<div class="text-center p-1" style="width: @totalPodiumsOneWidth%; color: white; background: rgb(246, 62, 48); border-radius: 10px 10px 10px 10px"><b>@totalPodiumsOneWidth %</b></div>
+								} else {
+									<div class="text-center p-1" style="width: @totalPodiumsOneWidth%; color: white; background: rgb(246, 62, 48); border-radius: 10px 0px 0px 10px"><b>@totalPodiumsOneWidth %</b></div>
+								}
+							}
+
+							@if (driverTwoData?.totalPodiums != 0) {
+								if (driverOneData?.totalPodiums == 0) {
+									<div class="text-center p-1" style="width: @totalPodiumsTwoWidth%; color: white; background: rgb(50, 130, 246); border-radius: 10px 10px 10px 10px"><b>@totalPodiumsTwoWidth %</b></div>
+								} else {
+									<div class="text-center p-1" style="width: @totalPodiumsTwoWidth%; color: white; background: rgb(50, 130, 246); border-radius: 0px 10px 10px 0px"><b>@totalPodiumsTwoWidth %</b></div>
+								}
+							}
+						</div>
+					</div>
+
+					@*Zapocete trke*@
+					<div class="container p-2 border-top">
+						<div class="row">
+							<div class="col">
+								<h5>@driverOneData?.raceStarts</h5>
+							</div>
+							<div class="col-6">
+								<h5>Zapocete trke</h5>
+							</div>
+							<div class="col">
+								<h5>@driverTwoData?.raceStarts</h5>
+							</div>
+						</div>
+						<div style="width: 100%; display: flex; height: 30px;">
+							@if (driverOneData?.raceStarts != 0) {
+								if (driverTwoData?.raceStarts == 0) {
+									<div class="text-center p-1" style="width: @raceStartsOneWidth%; color: white; background: rgb(246, 62, 48); border-radius: 10px 10px 10px 10px"><b>@raceStartsOneWidth %</b></div>
+								} else {
+									<div class="text-center p-1" style="width: @raceStartsOneWidth%; color: white; background: rgb(246, 62, 48); border-radius: 10px 0px 0px 10px"><b>@raceStartsOneWidth %</b></div>
+								}
+							}
+
+							@if (driverTwoData?.raceStarts != 0) {
+								if (driverOneData?.raceStarts == 0) {
+									<div class="text-center p-1" style="width: @raceStartsTwoWidth%; color: white; background: rgb(50, 130, 246); border-radius: 10px 10px 10px 10px"><b>@raceStartsTwoWidth %</b></div>
+								} else {
+									<div class="text-center p-1" style="width: @raceStartsTwoWidth%; color: white; background: rgb(50, 130, 246); border-radius: 0px 10px 10px 0px"><b>@raceStartsTwoWidth %</b></div>
+								}
+							}
+						</div>
+					</div>
+
+					@*Ukupni poeni*@
+					<div class="container p-2 border-top">
+						<div class="row">
+							<div class="col">
+								<h5>@driverOneData?.totalPoints</h5>
+							</div>
+							<div class="col-6">
+								<h5>Ukupni poeni</h5>
+							</div>
+							<div class="col">
+								<h5>@driverTwoData?.totalPoints</h5>
+							</div>
+						</div>
+						<div style="width: 100%; display: flex; height: 30px;">
+							@if (driverOneData?.totalPoints != 0) {
+								if (driverTwoData?.totalPoints == 0) {
+									<div class="text-center p-1" style="width: @totalPointsOneWidth%; color: white; background: rgb(246, 62, 48); border-radius: 10px 10px 10px 10px"><b>@totalPointsOneWidth %</b></div>
+								} else {
+									<div class="text-center p-1" style="width: @totalPointsOneWidth%; color: white; background: rgb(246, 62, 48); border-radius: 10px 0px 0px 10px"><b>@totalPointsOneWidth %</b></div>
+								}
+							}
+
+							@if (driverTwoData?.totalPoints != 0) {
+								if (driverOneData?.totalPoints == 0) {
+									<div class="text-center p-1" style="width: @totalPointsTwoWidth%; color: white; background: rgb(50, 130, 246); border-radius: 10px 10px 10px 10px"><b>@totalPointsTwoWidth %</b></div>
+								} else {
+									<div class="text-center p-1" style="width: @totalPointsTwoWidth%; color: white; background: rgb(50, 130, 246); border-radius: 0px 10px 10px 0px"><b>@totalPointsTwoWidth %</b></div>
+								}
+							}
+						</div>
+					</div>				
+				}
+			</div>
+		</div>
+		<div class="col-sm-4">
+			@if (!getDriverTwoImage) {
+				<div class="d-flex justify-content-center mb-2">
+					<div class="spinner-border m-5  card-img-top" style="width: 3rem; height: 3rem;" role="status"></div>
+				</div>
+			} else if (driverTwoImg == null) {
+				<h6 class="display-6">Failed to load driver image :(</h6>
+			} else {
+				<div style="min-height: 12rem">
+					<img class="mx-auto d-block rounded" src="@driverTwoImg" style="object-fit: scale-down; height: 18rem; max-width: 24rem" />
+				</div>
+			}
+			<div class="card shadow-sm p-2 mt-2">
+				@if (!getDriverTwoStatus) {
+					<div class="d-flex justify-content-center">
+						<div class="spinner-border m-5  card-img-top" style="width: 3rem; height: 3rem;" role="status"></div>
+					</div>
+				} else if (driverTwoData == null) {
+					<h3>Failed to load data :(</h3>
+				} else {
+					<h4 class="display-6 border-bottom">@driverTwoData.forename @driverTwoData.surname</h4>
+					<div class="row">
+						<div class="col">
+							<h6><b>Code - </b> @driverTwoData.code</h6>
+							<h6><b>Number - </b> @driverTwoData.number</h6>
+							<h6><b>DoB - </b> @driverTwoData.dob</h6>
+						</div>
+						<div class="col">
+							<h6><b>Nationality - </b> @driverTwoData.nationality</h6>
+							<h6><b>Wiki - </b> <a href="@driverTwoData.url">Link</a></h6>
+						</div>
+					</div>	
+				}
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private bool getDriverOneStatus = false;
+	private Driver? driverOneData;
+
+	private bool getDriverTwoStatus = false;
+	private Driver? driverTwoData;
+
+	private int championshipOneWidth;
+	private int championshipTwoWidth;
+
+	private int winsOneWidth;
+	private int winsTwoWidth;
+
+	private int sprintWinsOneWidth;
+	private int sprintWinsTwoWidth;
+
+	private int polesOneWidth;
+	private int polesTwoWidth;
+
+	private int totalPodiumsOneWidth;
+	private int totalPodiumsTwoWidth;
+
+	private int raceStartsOneWidth;
+	private int raceStartsTwoWidth;
+
+	private int totalPointsOneWidth;
+	private int totalPointsTwoWidth;
+
+	bool getDriversStatus = false;
+	private List<Driver>? drivers = null;
+
+	private int _driverOne = 4;
+	private int _driverTwo = 830;
+
+	private bool getDriverOneImage = false;
+	private string? driverOneImg = null;
+
+	private bool getDriverTwoImage = false;
+	private string? driverTwoImg = null;
+
+	private int driverOne {
+		get => _driverOne;
+		set {
+			_driverOne = value;
+			updateStats();
+		}
+	}
+
+	private int driverTwo {
+		get => _driverTwo;
+		set {
+			_driverTwo = value;
+			updateStats();
+		}
+	}
+
+	private async Task<bool> updateDriverOne() {
+		(getDriverOneStatus, driverOneData) = await driversService.getDriverWithStats(driverOne);
+
+		if (driverOneData != null && driverOneData.url != null) {
+			(getDriverOneImage, driverOneImg) = await driversService.getDriverImageUrl(driverOneData.url);
+		} else {
+			getDriverOneImage = true;
+		}
+
+		return true;
+	} 
+
+	private async Task<bool> updateDriverTwo() {
+		(getDriverTwoStatus, driverTwoData) = await driversService.getDriverWithStats(driverTwo);
+
+		if (driverTwoData != null && driverTwoData.url != null) {
+			(getDriverTwoImage, driverTwoImg) = await driversService.getDriverImageUrl(driverTwoData.url);
+		} else {
+			getDriverTwoImage = true;
+		}
+
+		return true;
+	}
+
+	private int getFirstPart(int? partOne, int? partTwo) {
+		if (partOne != null && partTwo != null) {
+			return (int)Math.Round((decimal)((partOne / (decimal)(partOne + partTwo)) * 100));
+		} else {
+			return 0;
+		}
+	}
+
+	private int getSecondPart(int? partOne, int? partTwo) {
+		if (partOne != null && partTwo != null) {
+			return (int)Math.Round((decimal)((partTwo / (decimal)(partOne + partTwo)) * 100));
+		} else {
+			return 0;
+		}
+	}
+
+	private async void updateStats() {
+		getDriverOneStatus = false;
+		driverOneData = null;
+		getDriverOneImage = false;
+		driverOneImg = null;
+
+		getDriverTwoStatus = false;
+		driverTwoData = null;
+		getDriverTwoImage = false;
+		driverTwoImg = null;
+
+		this.StateHasChanged();
+
+		_ = await updateDriverOne();
+		_ = await updateDriverTwo();
+
+		championshipOneWidth = getFirstPart(driverOneData?.championships, driverTwoData?.championships);
+		championshipTwoWidth = getSecondPart(driverOneData?.championships, driverTwoData?.championships);
+
+		winsOneWidth = getFirstPart(driverOneData?.wins, driverTwoData?.wins);
+		winsTwoWidth = getSecondPart(driverOneData?.wins, driverTwoData?.wins);
+
+		sprintWinsOneWidth = getFirstPart(driverOneData?.sprintWins, driverTwoData?.sprintWins);
+		sprintWinsTwoWidth = getSecondPart(driverOneData?.sprintWins, driverTwoData?.sprintWins);
+
+		polesOneWidth = getFirstPart(driverOneData?.poles, driverTwoData?.poles);
+		polesTwoWidth = getSecondPart(driverOneData?.poles, driverTwoData?.poles);
+
+		totalPodiumsOneWidth = getFirstPart(driverOneData?.totalPodiums, driverTwoData?.totalPodiums);
+		totalPodiumsTwoWidth = getSecondPart(driverOneData?.totalPodiums, driverTwoData?.totalPodiums);
+
+		raceStartsOneWidth = getFirstPart(driverOneData?.raceStarts, driverTwoData?.raceStarts);
+		raceStartsTwoWidth = getSecondPart(driverOneData?.raceStarts, driverTwoData?.raceStarts);
+
+		if (driverOneData?.totalPoints != null && driverTwoData?.totalPoints != null) {
+			totalPointsOneWidth = getFirstPart((int)driverOneData?.totalPoints, (int)driverTwoData?.totalPoints);
+			totalPointsTwoWidth = getSecondPart((int)driverOneData?.totalPoints, (int)driverTwoData?.totalPoints);
+		} else {
+			totalPointsOneWidth = 50;
+			totalPointsTwoWidth = 50;
+		}
+
+		this.StateHasChanged();
+	}
+
+	protected override async Task OnInitializedAsync() {
+		(getDriversStatus, drivers) = await driversService.getDriverList();
+		
+		updateStats();
+	}
+}

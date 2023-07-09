@@ -1,4 +1,5 @@
 ﻿
+
 <div class="container">
 	<nav class="navbar navbar-expand-lg card shadow-sm">
 		<div class="container-fluid">
@@ -9,6 +10,7 @@
 			<div class="collapse navbar-collapse" id="navbarLinks">
 				<div class="navbar-nav me-auto">
 					<a class="nav-link nav-item" href="raceoverview"><span data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show">Race overview</span></a>
+					<a class="nav-link nav-item" href="drivervsdriver"><span data-bs-toggle="collapse" data-bs-target=".navbar-collapse.show">Driver vs Driver</span></a>
 				</div>
 			</div>
 		</div>
@@ -18,8 +20,28 @@
 <br />
 
 <style>
+	html {
+		margin: 0;
+		height: 100%;
+	}
+
 	body {
-		background-image: linear-gradient(to right, #2c3e50, #4ca1af);
+		background: url("https://images.immediate.co.uk/production/volatile/sites/3/2023/02/F1-car-spec-ed1e29c.jpg") rgba(150, 150, 150, 0.3);
+		background-size: cover;
+		backdrop-filter: blur(12px);
+		background-blend-mode: overlay;
+		margin: 0;
+		height: 100%;
+
+	}
+
+	.glass-card {
+		background: rgba(255, 255, 255, 0.52);
+		border-radius: 16px;
+		box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+		backdrop-filter: blur(13.3px);
+		-webkit-backdrop-filter: blur(13.3px);
+		border: 1px solid rgba(255, 255, 255, 0.3);
 	}
 
 	

@@ -181,21 +181,16 @@
 				}else if (driverData == null) {
 					<h6>Failed to load driver details :(</h6>
 				} else {
-					@*<div style="overflow: hidden; -webkit-transform: translate3d(0, 0, 0);">
-						<img class="card-img-top mx-auto d-block" src="@driverImgUrl" style="object-fit: cover; min-height:200px; max-height:250px; -webkit-filter: blur(16px); overflow: hidden;" />
-					</div>*@
 					<div class="boder-bottom"></div>
 					<div class="card-body">
-						<h4 class="card-title border-bottom">Detalji prvog vozaca</h4>
+						<h4 class="display-6 border-bottom">@driverData.forename @driverData.surname</h4>
 						<div class="row">
 							<div class="col">
-								<h6><b>Forename - </b> @driverData.forename</h6>
 								<h6><b>Code - </b> @driverData.code</h6>
 								<h6><b>DoB - </b> @driverData.dob</h6>
 								<h6><b>Wiki - </b> <a href="@driverData.url">Link</a></h6>
 							</div>
 							<div class="col">
-								<h6><b>Surname - </b> @driverData.surname</h6>
 								<h6><b>Number - </b> @driverData.number</h6>
 								<h6><b>Nationality - </b> @driverData.nationality</h6>
 							</div>
