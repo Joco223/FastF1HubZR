@@ -2,8 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31611.283
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastF1HubZR", "FastF1HubZR\FastF1HubZR.csproj", "{EB0AE49F-D34F-4EF4-87B4-145846C5F9BD}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FastF1Shared", "FastF1Shared\FastF1Shared.csproj", "{2DDEAFF6-4557-4DF0-92EF-D95C1D3C136E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSite", "WebSite\WebSite.csproj", "{EC3CC0C1-379C-48A5-905D-43EC53F4A1D7}"
@@ -14,12 +12,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{EB0AE49F-D34F-4EF4-87B4-145846C5F9BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EB0AE49F-D34F-4EF4-87B4-145846C5F9BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EB0AE49F-D34F-4EF4-87B4-145846C5F9BD}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{EB0AE49F-D34F-4EF4-87B4-145846C5F9BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EB0AE49F-D34F-4EF4-87B4-145846C5F9BD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EB0AE49F-D34F-4EF4-87B4-145846C5F9BD}.Release|Any CPU.Deploy.0 = Release|Any CPU
 		{2DDEAFF6-4557-4DF0-92EF-D95C1D3C136E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2DDEAFF6-4557-4DF0-92EF-D95C1D3C136E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DDEAFF6-4557-4DF0-92EF-D95C1D3C136E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,7 +25,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		        SolutionGuid = {61F7FB11-1E47-470C-91E2-47F8143E1572}
 		SolutionGuid = {FDC4564E-CB46-47EC-9E1B-A932FD04F665}
+		        SolutionGuid = {61F7FB11-1E47-470C-91E2-47F8143E1572}
 	EndGlobalSection
 EndGlobal

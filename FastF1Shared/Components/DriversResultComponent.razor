@@ -1,5 +1,5 @@
 ﻿@using FastF1Shared.Model;
-@inject FastF1Shared.Service.DriversResultService dtService
+@using FastF1Shared.Service;
 @inject IJSRuntime JsRuntime
 
 @using Microsoft.JSInterop;
@@ -173,9 +173,9 @@
 		sessionType = type;
 		this.StateHasChanged();
 		if (type == "Race" || type == "Sprint") {
-			(loaded, results) = await Service.DriversResultService.getRaceResults(year, round.ToString());
+			(loaded, results) = await driversService.getRaceResults(year, round.ToString());
 		} else {
-			(loaded, qualiResults) = await Service.DriversResultService.getQualyResults(year, round.ToString());
+			(loaded, qualiResults) = await driversService.getQualyResults(year, round.ToString());
 		}
 		decrementTable();
 		this.StateHasChanged();

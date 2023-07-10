@@ -250,7 +250,7 @@
 	List<Race>? races = null;
 
 	bool getDriverDetailStatus = false;
-	detailDriverData? driverData = null;
+	Driver? driverData = null;
 
 	private async Task<bool> loadDriverDetail() {
 		int driverID = -1;
@@ -265,7 +265,7 @@
 		}
 
 		if (driverID != -1) {
-			(getDriverDetailStatus, driverData) = await driverDetailService.getDriver(driverID);
+			(getDriverDetailStatus, driverData) = await driversService.getDriver(driverID);
 
 			loadDriverImage();
 			return true;
@@ -284,24 +284,20 @@
 	}
 
 	private async void loadDriverImage() {
+		string driverWikiUrl = "";
+
 		if (sessionInput == "Race" || sessionInput == "Sprint") {
 			if (resultTable != null && resultTable.results != null && resultTable.results.Count > 0) {
-				driverRaceResult res = resultTable.results[0];
-
-				int slashIndex = res.url.LastIndexOf('/');
-				string searchTerm = res.url[(slashIndex + 1)..];
-
-				(driverImgResult, driverImgUrl) = await wikipediaAPIService.getPageImg(searchTerm);
+				driverWikiUrl = resultTable.results[0].url;
 			}
 		} else {
 			if (resultTable != null && resultTable.qualiResults != null && resultTable.qualiResults.Count > 0) {
-				driverQualyResult res = resultTable.qualiResults[0];
-
-				int slashIndex = res.url.LastIndexOf('/');
-				string searchTerm = res.url[(slashIndex + 1)..];
-
-				(driverImgResult, driverImgUrl) = await wikipediaAPIService.getPageImg(searchTerm);
+				driverWikiUrl = resultTable.qualiResults[0].url;
 			}
+		}
+
+		if (driverWikiUrl != "") {
+			(driverImgResult, driverImgUrl) = await driversService.getDriverImageUrl(driverWikiUrl);
 		}
 		this.StateHasChanged();
 	}
